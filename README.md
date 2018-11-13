@@ -3,12 +3,13 @@
 Bluetooth Low Energy Beacon with NRF52840
 
 Project:
-
-           Beacon sensor 
+          
+          Beacon sensor 
+          
 Description:
 
-           This project is based on NRF52840 module (DK and Liard Module). It's main operation is to read the data from sensor and 
-           advertise in timely basis.
+           This project is based on NRF52840 module (DK and Liard Module). It's main operation is to read the 
+           data from sensor and advertise in timely basis.
            
 Basic consideration:
 
@@ -27,7 +28,8 @@ Initial folow diagram
                                 Debug init  (serial)
                                         |
                                Board init
-                                 Sensor init (Interface and Module) (For low power operation we do not need it)
+                                 Sensor init (Interface and Module) 
+                                 (For low power operation we do not need it)
                                  Led Init
                                  Button init
                                         |
