@@ -143,7 +143,7 @@
 #define PPID               ""
 
 //The temperature sensor is polled this timeout
-#define TEMPERATURE_POLL_MS     (20000)
+#define TEMPERATURE_POLL_MS     (1000)
 
 //SIO that the temperature sensor is connected to
 #define GPIO_TEMP_SENSOR        3
@@ -159,7 +159,8 @@ dim scanRpt$ : scanRpt$ = ""
 dim adRptE$ : adRptE$ = ""
 dim scanRptE$ : scanRptE$ = ""
 dim stRsp$ as string  //Uart rx data is stored here
-dim oldtmp : oldtmp = 0
+dim oldadc : oldadc = 0
+dim oldbat : oldbat = 0
 
 //******************************************************************************
 // Function and Subroutine definitions
@@ -243,15 +244,19 @@ endfunc mv
 // This handler is called when TIMER 0 expires
 //==============================================================================
 function HandlerTimer2() as integer
-  dim mV,tmp
+  dim mVadc,mVbat,tmp
   
-  mv = Adc2Mv(GpioRead(GPIO_TEMP_SENSOR))
-  DbgMsg("\nAdc mV=") : DbgVal(mv)
+  oldadc = Adc2Mv(GpioRead(GPIO_TEMP_SENSOR))
+  DbgMsg("\nAdc mV=") : DbgVal(oldadc)
 
-  tmp = Mv2Temperature(mv)
-  DbgMsg("\nTemperature=") : DbgVal(tmp)
-  //DbgMsg("\noldtmp=") : DbgVal(oldtmp)
-  oldtmp = tmp
+  //tmp = Mv2Temperature(mv)
+  //DbgMsg("\nTemperature=") : DbgVal(tmp)
+  //DbgMsg("\noldadc=") : DbgVal(oldadc)
+  //oldadc = mvadc
+  
+  oldbat = ReadPwrSupplyMv()
+  DbgMsg("\nBat mV=") : DbgVal(oldbat)
+  
 endfunc 1
 
 Function EddyStone1$()
@@ -286,17 +291,17 @@ Function EddyStone2$()
     //            EddyStone_URL
     // AAFE 10 E2 00646576696365776F727800
 //------------------------------------------------------------------
-    dim eddy2$, http$, com$, feddy2$, temp1$
+    dim eddy2$, http$, com$, feddy2$, adcval$, batval$
 
     rc = BleEncode16(eddy2$,EDDY_SVC_UUID,0)
     rc = BleEncode8(eddy2$,URL,2)
     rc = BleEncode8(eddy2$,TX_PWR_EDDY,3)
     rc = BleEncode8(http$,HTTP,0)
     rc = BleEncode8(com$,COM,0)
-	SPRINT #temp1$, oldtmp
-	//DbgMsg("\neddy oldtmp=") : DbgVal(oldtmp)
+	SPRINT #adcval$, oldadc
+	SPRINT #batval$, oldbat
 
-    feddy2$ = eddy2$ + http$ + EDDY_URL + com$ + temp1$
+    feddy2$ = eddy2$ + http$ + EDDY_URL + com$ + adcval$ + "/" + batval$
 endfunc feddy2$
 
 Sub Startup()
